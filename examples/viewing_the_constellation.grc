@@ -49,15 +49,37 @@ blocks:
   id: variable_qtgui_entry
   parameters:
     comment: ''
+    entry_signal: editingFinished
     gui_hint: ''
     label: Center freq.
     type: int
-    value: '569143000'
+    value: '527143000'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
     coordinate: [434, 80]
+    rotation: 0
+    state: enabled
+- name: gain
+  id: variable_qtgui_range
+  parameters:
+    comment: ''
+    gui_hint: ''
+    label: ''
+    min_len: '200'
+    orient: QtCore.Qt.Horizontal
+    rangeType: float
+    start: '0'
+    step: '0.01'
+    stop: '1'
+    value: '0.14'
+    widget: counter_slider
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [176, 36.0]
     rotation: 0
     state: enabled
 - name: guard
@@ -93,7 +115,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [184, 83]
+    coordinate: [672, 36.0]
     rotation: 0
     state: enabled
 - name: total_carriers
@@ -131,7 +153,7 @@ blocks:
     alias: ''
     begin_tag: pmt.PMT_NIL
     comment: ''
-    file: /home/gnuradio/persistent/569MHz_recording.dat
+    file: /home/radarg/Documents/ISDBT/usrp_samples.dat
     length: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -143,9 +165,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [38, 184]
+    coordinate: [24, 172.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: blocks_throttle_0
   id: blocks_throttle
   parameters:
@@ -162,9 +184,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [287, 200]
+    coordinate: [280, 188.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: blocks_vector_to_stream_0
   id: blocks_vector_to_stream
   parameters:
@@ -240,13 +262,44 @@ blocks:
     coordinate: [977, 308]
     rotation: 180
     state: enabled
+- name: iio_pluto_source_0
+  id: iio_pluto_source
+  parameters:
+    affinity: ''
+    alias: ''
+    bandwidth: '6000000'
+    bbdc: 'True'
+    buffer_size: '32768'
+    comment: ''
+    filter: ''
+    filter_source: '''Auto'''
+    fpass: '0'
+    frequency: center_freq
+    fstop: '0'
+    gain1: '''manual'''
+    len_tag_key: packet_len
+    manual_gain1: '40'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    quadrature: 'True'
+    rfdc: 'True'
+    samplerate: '8126984'
+    type: fc32
+    uri: '"ip:11.1.2.105"'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [40, 468.0]
+    rotation: 0
+    state: disabled
 - name: isdbt_ofdm_synchronization_0
   id: isdbt_ofdm_synchronization
   parameters:
     affinity: ''
     alias: ''
     comment: ''
-    cp_length: '0.0625'
+    cp_length: '0.125'
     interpolate: 'True'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -282,6 +335,27 @@ blocks:
     coordinate: [529, 195]
     rotation: 0
     state: enabled
+- name: pfb_arb_resampler_xxx_0
+  id: pfb_arb_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    atten: '100'
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    nfilts: '32'
+    rrate: (6.4e6*80/63 ) / 8e6
+    samp_delay: '0'
+    taps: ''
+    type: ccf
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [40, 316.0]
+    rotation: 0
+    state: disabled
 - name: qtgui_const_sink_x_0
   id: qtgui_const_sink_x
   parameters:
@@ -452,7 +526,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [438, 369]
+    coordinate: [392, 428.0]
     rotation: 0
     state: enabled
 - name: qtgui_time_sink_x_0
@@ -680,7 +754,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [129, 498]
+    coordinate: [144, 556.0]
     rotation: 0
     state: true
 - name: uhd_usrp_source_0
@@ -688,7 +762,7 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    ant0: ''
+    ant0: '"RX2"'
     ant1: ''
     ant10: ''
     ant11: ''
@@ -720,7 +794,7 @@ blocks:
     ant7: ''
     ant8: ''
     ant9: ''
-    bw0: '0'
+    bw0: '5600000'
     bw1: '0'
     bw10: '0'
     bw11: '0'
@@ -785,7 +859,7 @@ blocks:
     center_freq8: '0'
     center_freq9: '0'
     clock_rate: '0.0'
-    clock_source0: ''
+    clock_source0: external
     clock_source1: ''
     clock_source2: ''
     clock_source3: ''
@@ -860,7 +934,7 @@ blocks:
     dc_offs_enb9: default
     dev_addr: '""'
     dev_args: '""'
-    gain0: '0'
+    gain0: '24'
     gain1: '0'
     gain10: '0'
     gain11: '0'
@@ -1056,8 +1130,8 @@ blocks:
     minoutbuf: '0'
     nchan: '1'
     num_mboards: '1'
-    otw: ''
-    rx_agc0: Default
+    otw: sc8
+    rx_agc0: Disabled
     rx_agc1: Default
     rx_agc10: Default
     rx_agc11: Default
@@ -1116,25 +1190,32 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [112, 303]
+    coordinate: [48, 312.0]
     rotation: 0
-    state: disabled
+    state: enabled
 
 connections:
 - [blocks_complex_to_mag_0, '0', blocks_vector_to_stream_0, '0']
 - [blocks_file_source_1_0, '0', blocks_throttle_0, '0']
+- [blocks_file_source_1_0, '0', low_pass_filter_0, '0']
+- [blocks_file_source_1_0, '0', pfb_arb_resampler_xxx_0, '0']
+- [blocks_file_source_1_0, '0', qtgui_freq_sink_x_0_0, '0']
 - [blocks_throttle_0, '0', low_pass_filter_0, '0']
 - [blocks_throttle_0, '0', qtgui_freq_sink_x_0_0, '0']
 - [blocks_vector_to_stream_0, '0', qtgui_time_sink_x_0, '0']
 - [blocks_vector_to_stream_0_0, '0', qtgui_time_sink_x_0_0, '0']
 - [blocks_vector_to_stream_0_2, '0', qtgui_const_sink_x_0, '0']
 - [fft_vxx_0_0, '0', blocks_vector_to_stream_0_0, '0']
+- [iio_pluto_source_0, '0', low_pass_filter_0, '0']
+- [iio_pluto_source_0, '0', qtgui_freq_sink_x_0_0, '0']
 - [isdbt_ofdm_synchronization_0, '0', blocks_vector_to_stream_0_2, '0']
 - [isdbt_ofdm_synchronization_0, '1', blocks_complex_to_mag_0, '0']
 - [isdbt_ofdm_synchronization_0, '1', fft_vxx_0_0, '0']
 - [low_pass_filter_0, '0', isdbt_ofdm_synchronization_0, '0']
+- [pfb_arb_resampler_xxx_0, '0', blocks_throttle_0, '0']
 - [uhd_usrp_source_0, '0', low_pass_filter_0, '0']
+- [uhd_usrp_source_0, '0', qtgui_freq_sink_x_0_0, '0']
 
 metadata:
   file_format: 1
-  grc_version: v3.11.0.0git-55-g8526e6f8
+  grc_version: 3.10.9.2

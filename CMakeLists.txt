@@ -15,7 +15,7 @@ set(CMAKE_BUILD_TYPE "Release" CACHE STRING "")
 # Project setup
 ########################################################################
 cmake_minimum_required(VERSION 3.8)
-project(gr-isdbt CXX C)
+project(gr-isdbt-fixedvec CXX C)
 enable_testing()
 
 # Install to PyBOMBS target prefix if defined
