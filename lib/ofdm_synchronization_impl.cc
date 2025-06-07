@@ -780,6 +780,7 @@ gr::io_signature::makev(
             {
                 const gr_complex *in = (const gr_complex *) input_items[0];
                 gr_complex *out = (gr_complex *) output_items[0];
+                gr_complex *out2 = (gr_complex *) output_items[4];
 
                 bool ch_output_connected = output_items.size()>=2; 
                 bool freq_error_output_connected = output_items.size()>=3; 
@@ -798,7 +799,6 @@ gr::io_signature::makev(
                 d_consumed = 0;
                 d_out = 0;
 
-
                 for (int i = 0; i < noutput_items ; i++) 
                 {
                     int required_for_interpolation = d_cp_length + d_fft_length; 
@@ -812,8 +812,6 @@ gr::io_signature::makev(
                         //the interpolation should be restarted too (not the correcting factor, 
                         //which should not have changed, only the phase of the interpolator)
                         d_samp_phase = 0; 
-                        //d_samp_inc = 1.0; 
-                        //d_est_delta = 0; 
                         
                         //CP position may have changed
                         d_moved_cp = true; 
@@ -836,8 +834,6 @@ gr::io_signature::makev(
                         int cp_start_temp; 
                         float coarse_freq_temp; 
                         d_cp_found = ml_sync(&in[d_consumed], d_cp_start + 8, std::max(d_cp_start - 8,d_cp_length+d_fft_length-1), &cp_start_temp, &coarse_freq_temp);
-                        //d_cp_start = cp_start_temp; 
-                        //d_coarse_freq = coarse_freq_temp; 
 
                         if ( !d_cp_found )
                         {
@@ -862,10 +858,6 @@ gr::io_signature::makev(
                         // symbol. It is better to stay on the safe-side (plus, 10 samples is nothing in this context). 
                         d_cp_start_offset = -10;  
 
-                        /*
-                           int low = d_consumed + d_cp_start + d_cp_start_offset - d_fft_length + 1 ;
-                           derotate(&in[low], &d_prefft_synched[0]);
-                           */
 
                         int low = d_cp_start + d_cp_start_offset - d_fft_length + 1 ;
                        
@@ -924,20 +916,11 @@ gr::io_signature::makev(
 
                         // Equalization is applied. 
     
-                        //I now perform a rather indirect complex division with VOLK (plus, I tried to minimize
-                        // the usage of auxilary variables) 
-                        // TODO a new VOLK kernel that makes complex division? Already implemented. 
-                        // However, I'll use what follows instead for compatibility reasons. Uncomment the next line instead
-                        // when its usage is widespread. 
-                        //volk_32fc_x2_divide_32fc(&out[i*d_active_carriers], d_integer_freq_derotated, d_channel_gain, d_active_carriers);
                         
                         volk_32fc_x2_multiply_conjugate_32fc(&out[i*d_active_carriers], d_integer_freq_derotated, d_channel_gain, d_active_carriers);
                         volk_32fc_magnitude_squared_32f(d_channel_gain_mag_sq, d_channel_gain, d_active_carriers);
                         volk_32f_x2_divide_32f(d_channel_gain_mag_sq, d_ones, d_channel_gain_mag_sq, d_active_carriers);
                         volk_32fc_32f_multiply_32fc(&out[i*d_active_carriers], &out[i*d_active_carriers], d_channel_gain_mag_sq, d_active_carriers);
-                        // Using what follows instead, is actually slower (seems that taking powers is worse than simply dividing).
-                        //volk_32fc_s32f_power_32fc(d_channel_gain_inv, d_channel_gain, -1.0, d_active_carriers);
-                        //volk_32fc_x2_multiply_32fc(&out[i*d_active_carriers], d_integer_freq_derotated, d_channel_gain_inv, d_active_carriers);
 
                         if (ch_output_connected){
                             // the channel taps output is connected
