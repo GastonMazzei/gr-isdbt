@@ -89,11 +89,21 @@ namespace gr {
         ofdm_synchronization_impl::ofdm_synchronization_impl(int mode, float cp_length, bool interpolate)
             : gr::block("ofdm_synchronization",
                     gr::io_signature::make(1, 1, sizeof(gr_complex)),
-                    //gr::io_signature::make(1,1,sizeof(gr_complex)*pow(2.0,10+mode))),
-                    gr::io_signature::make3(1, 4, \
-                            sizeof(gr_complex)*(1+d_total_segments*d_carriers_per_segment_2k*((int)pow(2.0,mode-1))),\
-                            sizeof(gr_complex)*(1+d_total_segments*d_carriers_per_segment_2k*((int)pow(2.0,mode-1))),\
-                            sizeof(float))
+//                    gr::io_signature::make3(1, 4, \
+ //                           sizeof(gr_complex)*(1+d_total_segments*d_carriers_per_segment_2k*((int)pow(2.0,mode-1))),\
+  //                          sizeof(gr_complex)*(1+d_total_segments*d_carriers_per_segment_2k*((int)pow(2.0,mode-1))),\
+   //                         sizeof(float))
+
+gr::io_signature::makev(
+    1, 5,    // exactly five outputs
+    std::vector<int>{
+        sizeof(gr_complex) * (1+d_total_segments*d_carriers_per_segment_2k*((int)pow(2.0,mode-1))) , //active_size,    // port 0: active-carriers
+        sizeof(gr_complex) * (1+d_total_segments*d_carriers_per_segment_2k*((int)pow(2.0,mode-1))), //active_size,    // port 1: channel-taps
+        sizeof(float),                       // port 3: freq error
+        sizeof(float),                        // port 4: samp error
+        sizeof(gr_complex) *(1 << (10 + mode)), // 8192 //d_fft_length    // port 2: fft bins
+    }
+)
 
               ),
               d_fft_calculator(gr::fft::fft_complex_fwd(pow(2.0,10+mode),true)), 
