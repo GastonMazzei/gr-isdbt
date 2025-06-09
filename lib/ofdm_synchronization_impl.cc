@@ -108,13 +108,14 @@ gr::io_signature::makev(
 
               ),
               d_fft_calculator(gr::fft::fft_complex_fwd(pow(2.0,10+mode),true)), 
-              d_inter(gr::filter::mmse_fir_interpolator_cc())
+              d_inter(gr::filter::mmse_fir_interpolator_cc()),
+	      d_ifft_calculator(pow(2.0,10+mode) , true)
               {
                   // TODO why must fft_complex be initialized in the constructor declaration????
 
                   //d_fft_length = 1+d_total_segments*d_carriers_per_segment_2k*((int)pow(2.0,mode-1)); 
                   d_fft_length = pow(2.0,10+mode); 
-                  d_cp_length = (int)round(cp_length*d_fft_length); 
+		  d_cp_length = (int)round(cp_length*d_fft_length); 
                   d_active_carriers = (1+d_total_segments*d_carriers_per_segment_2k*pow(2.0,mode-1)); 
 
                   set_relative_rate(1.0 / (double) (d_cp_length + d_fft_length));
@@ -607,6 +608,34 @@ gr::io_signature::makev(
 
             }
 
+
+void ofdm_synchronization_impl::calculate_ifft(const gr_complex* in_shifted,
+                                               gr_complex*       out_time)
+{
+    const unsigned int N   = d_fft_length;
+    const unsigned int len = (unsigned int)std::ceil(N/2.0);
+
+    // 1) undo the fftshift:
+    //    copy the negative‐freq half at end → front of IFFT input
+    memcpy(d_ifft_calculator.get_inbuf(),
+           in_shifted + (N - len),
+           sizeof(gr_complex) * len);
+    //    copy the positive‐freq half at front → after that
+    memcpy(d_ifft_calculator.get_inbuf() + len,
+           in_shifted,
+           sizeof(gr_complex) * (N - len));
+
+    // 2) run the inverse FFT (normalized if you passed 'true' at init)
+    d_ifft_calculator.execute();
+
+    // 3) copy the resulting time-domain samples out
+    memcpy(out_time,
+           d_ifft_calculator.get_outbuf(),
+           sizeof(gr_complex) * N);
+}
+
+
+
         void
             ofdm_synchronization_impl::peak_detect_init(float threshold_factor_rise, float alpha)
             {
@@ -934,6 +963,8 @@ gr::io_signature::makev(
 			std::fill_n( out_freqcorrected_equalized_noncropped , d_fft_length , gr_complex{0,0});                  // zero everything
 			std::memcpy( out_freqcorrected_equalized_noncropped + d_zeros_on_left , 
 				     &out[i*d_active_carriers], sizeof(gr_complex)* d_active_carriers); // copy just the active slice
+			calculate_ifft(out_freqcorrected_equalized_noncropped,
+               				out_freqcorrected_equalized_noncropped);
 
                         if (ch_output_connected){
                             // the channel taps output is connected

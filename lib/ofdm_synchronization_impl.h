@@ -84,6 +84,10 @@ namespace gr {
                 gr_complex * d_postfft; 
                 gr::fft::fft_complex_fwd d_fft_calculator; 
 
+		// radarg: adding inverse fft feature
+		//
+		gr::fft::fft_complex_rev d_ifft_calculator;
+
                 //zero padding to the left
                 int d_zeros_on_left;
                 //integer frequency variables
@@ -208,6 +212,10 @@ namespace gr {
                  * Note that the fft_size is assumed given by d_fft_length. 
                  */
                 void calculate_fft(gr_complex * out); 
+
+		// radarg: we add
+		    void calculate_ifft(const gr_complex* in_shifted,
+                        gr_complex*       out_time);
 
                 /*!
                  * \brief Calculates the likelihood function, and outputs the position of its maximum. 
