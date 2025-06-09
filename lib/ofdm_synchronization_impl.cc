@@ -95,7 +95,7 @@ namespace gr {
    //                         sizeof(float))
 
 gr::io_signature::makev(
-    1, 5,    // exactly five outputs
+    1, 6,    // exactly five outputs
     std::vector<int>{
         sizeof(gr_complex) * (1+d_total_segments*d_carriers_per_segment_2k*((int)pow(2.0,mode-1))) , //active_size,    // port 0: active-carriers
         sizeof(gr_complex) * (1+d_total_segments*d_carriers_per_segment_2k*((int)pow(2.0,mode-1))), //active_size,    // port 1: channel-taps
@@ -895,10 +895,6 @@ gr::io_signature::makev(
                         // correct the integer frequency offset (point to the shifted position)
                         d_integer_freq_derotated = &d_postfft[0] + current_freq_offset + d_zeros_on_left; 
 
-			// radarg
-			// Define our observation channel's values
-			//std::fill_n( out_raw_freqcorrected , d_fft_length , gr_complex{0,0});                  // zero everything
-			//std::memcpy(out_raw_freqcorrected +d_zeros_on_left , d_postfft+d_zeros_on_left , sizeof(gr_complex)* d_active_carriers); // copy just the active slice
 
 
                         //Estimate the current symbol index. 
@@ -932,6 +928,12 @@ gr::io_signature::makev(
                         volk_32fc_magnitude_squared_32f(d_channel_gain_mag_sq, d_channel_gain, d_active_carriers);
                         volk_32f_x2_divide_32f(d_channel_gain_mag_sq, d_ones, d_channel_gain_mag_sq, d_active_carriers);
                         volk_32fc_32f_multiply_32fc(&out[i*d_active_carriers], &out[i*d_active_carriers], d_channel_gain_mag_sq, d_active_carriers);
+			
+			// radarg
+			// Define our observation channel's values
+			std::fill_n( out_freqcorrected_equalized_noncropped , d_fft_length , gr_complex{0,0});                  // zero everything
+			std::memcpy( out_freqcorrected_equalized_noncropped + d_zeros_on_left , 
+				     &out[i*d_active_carriers], sizeof(gr_complex)* d_active_carriers); // copy just the active slice
 
                         if (ch_output_connected){
                             // the channel taps output is connected
