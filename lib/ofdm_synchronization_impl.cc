@@ -875,6 +875,9 @@ gr::io_signature::makev(
                             derotate(&in[d_consumed+low], d_fft_calculator.get_inbuf());
                         }
 
+			//radarg 
+			derotate(&in[d_consumed+low], out2);			
+
                         // I (naturally) calculate the FFT. 
                         calculate_fft(d_postfft);
 
@@ -889,6 +892,12 @@ gr::io_signature::makev(
 
                         // correct the integer frequency offset (point to the shifted position)
                         d_integer_freq_derotated = &d_postfft[0] + current_freq_offset + d_zeros_on_left; 
+
+			// radarg
+			// Define our observation channel's values
+			//std::fill_n(out2, d_fft_length , gr_complex{0,0});                  // zero everything
+			//std::memcpy(out2+d_zeros_on_left , d_postfft+d_zeros_on_left , sizeof(gr_complex)* d_active_carriers); // copy just the active slice
+
 
                         //Estimate the current symbol index. 
                         //Only re-estimate it when the symbol was not acquired. 
