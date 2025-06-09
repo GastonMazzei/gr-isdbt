@@ -48,7 +48,12 @@ outputs:
     domain: stream
     dtype: float
     optional: true
--   label: fft bins                         # ← new port
+-   label: raw freq corrected                         # ← new port
+    domain: stream
+    dtype: complex
+    vlen: ${ 2**(10+mode) }                # 2^(10+mode) → 2048,4096,8192
+    optional: true
+-   label: equalized freq corrected non cropped                         # ← new port
     domain: stream
     dtype: complex
     vlen: ${ 2**(10+mode) }                # 2^(10+mode) → 2048,4096,8192

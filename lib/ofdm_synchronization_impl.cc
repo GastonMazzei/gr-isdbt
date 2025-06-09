@@ -102,6 +102,7 @@ gr::io_signature::makev(
         sizeof(float),                       // port 3: freq error
         sizeof(float),                        // port 4: samp error
         sizeof(gr_complex) *(1 << (10 + mode)), // 8192 //d_fft_length    // port 2: fft bins
+        sizeof(gr_complex) *(1 << (10 + mode)), // 8192 //d_fft_length    // port 2: fft bins
     }
 )
 
@@ -780,7 +781,8 @@ gr::io_signature::makev(
             {
                 const gr_complex *in = (const gr_complex *) input_items[0];
                 gr_complex *out = (gr_complex *) output_items[0];
-                gr_complex *out2 = (gr_complex *) output_items[4];
+                gr_complex *out_raw_freqcorrected = (gr_complex *) output_items[4];
+                gr_complex *out_freqcorrected_equalized_noncropped = (gr_complex *) output_items[5];
 
                 bool ch_output_connected = output_items.size()>=2; 
                 bool freq_error_output_connected = output_items.size()>=3; 
@@ -876,7 +878,7 @@ gr::io_signature::makev(
                         }
 
 			//radarg 
-			derotate(&in[d_consumed+low], out2);			
+			derotate(&in[d_consumed+low], out_raw_freqcorrected); 
 
                         // I (naturally) calculate the FFT. 
                         calculate_fft(d_postfft);
@@ -895,8 +897,8 @@ gr::io_signature::makev(
 
 			// radarg
 			// Define our observation channel's values
-			//std::fill_n(out2, d_fft_length , gr_complex{0,0});                  // zero everything
-			//std::memcpy(out2+d_zeros_on_left , d_postfft+d_zeros_on_left , sizeof(gr_complex)* d_active_carriers); // copy just the active slice
+			//std::fill_n( out_raw_freqcorrected , d_fft_length , gr_complex{0,0});                  // zero everything
+			//std::memcpy(out_raw_freqcorrected +d_zeros_on_left , d_postfft+d_zeros_on_left , sizeof(gr_complex)* d_active_carriers); // copy just the active slice
 
 
                         //Estimate the current symbol index. 
